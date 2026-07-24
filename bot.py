@@ -1,8 +1,8 @@
 """
-디스코드 음성채널 공부시간 추적 봇
+디스코드 음성채널 작업시간 추적 봇
 --------------------------------
 - 등록된 팀원이 음성 채널에 머무는 시간을 하루 단위로 집계
-- 하루 목표(기본 6시간)를 채웠는지 매일 오전 6시에 정산
+- 하루 목표(기본 4시간)를 채웠는지 매일 오전 6시에 정산
 - 목표 미달 시 부족한 시간만큼 벌금을 누적 계산 (사유를 미리 적으면 면제)
 - 데이터는 SQLite 파일(study_bot.db)에 저장
 
@@ -28,12 +28,13 @@ load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")                 # .env 파일에 봇 토큰 입력
 TZ = ZoneInfo("Asia/Seoul")                        # 시간대 (한국)
 
-TARGET_HOURS = 6.0                                 # 하루 목표 시간
+TARGET_HOURS = 4.0                                 # 하루 목표 시간
 DAY_START_HOUR = 6                                 # 하루 기준 시각(정산 시각), 오전 6시
-FINE_PER_HOUR = 1000                               # 부족한 1시간당 벌금(원)
+FINE_PER_HOUR = 5000                               # 부족한 1시간당 벌금(원)
 
-# 정산 결과를 올릴 텍스트 채널 ID (0 이면 첫 번째로 찾은 텍스트 채널 사용)
-REPORT_CHANNEL_ID = 0
+# 정산 결과를 올릴 텍스트 채널 ID.
+# 클라우드에서는 REPORT_CHANNEL_ID 환경변수로 지정 (0 이면 첫 번째로 찾은 텍스트 채널 사용)
+REPORT_CHANNEL_ID = int(os.getenv("REPORT_CHANNEL_ID", "0"))
 
 # 시간을 인정할 음성 채널 ID 목록. 비워두면 AFK 채널을 뺀 모든 음성 채널 인정
 TRACKED_CHANNEL_IDS: set[int] = set()              # 예: {123456789012345678}
@@ -246,7 +247,7 @@ async def run_settlement(date: str) -> discord.Embed:
 
     rows.sort(key=lambda r: r[1], reverse=True)
     embed = discord.Embed(
-        title=f"📊 {date} 공부시간 정산 (목표 {TARGET_HOURS:g}시간)",
+        title=f"📊 {date} 작업시간 정산 (목표 {TARGET_HOURS:g}시간)",
         color=0x5865F2,
     )
     if not rows:
@@ -547,7 +548,7 @@ async def manual_settle(ctx, date: str = None):
 @bot.command(name="도움", aliases=["명령어", "help"])
 async def help_cmd(ctx):
     embed = discord.Embed(
-        title="🤖 공부시간 봇 명령어",
+        title="🤖 작업시간 봇 명령어",
         color=0x5865F2,
         description=(
             f"목표: 하루 **{TARGET_HOURS:g}시간** (오전 {DAY_START_HOUR}시 기준 정산)\n"

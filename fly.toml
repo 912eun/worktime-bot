@@ -1,19 +1,29 @@
-# Fly.io 배포 설정
-# 앱 이름(app)은 전세계에서 유일해야 합니다. flyctl launch 시 자동으로 바꿔줍니다.
-app = "study-time-bot"
-primary_region = "nrt"          # nrt = 도쿄 (한국에서 가장 가까움)
+# fly.toml app configuration file generated for ye-worktime-bot on 2026-07-24T20:34:37+09:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'ye-worktime-bot'
+primary_region = 'nrt'
 
 [build]
-
-# 봇 기록(SQLite)을 저장할 영구 볼륨. 이름은 아래 가이드에서 만드는 볼륨과 같아야 함.
-[mounts]
-  source = "botdata"
-  destination = "/data"
-
 [env]
-  DATA_DIR = "/data"
+  DATA_DIR = '/data'
 
-# 봇은 웹 서버가 아니므로 항상 켜져 있어야 합니다(자동 종료 금지).
+[[mounts]]
+  source = 'botdata'
+  destination = '/data'
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = 'stop'
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ['app']
+
 [[vm]]
-  size = "shared-cpu-1x"
-  memory = "256mb"
+  size = 'shared-cpu-1x'
+  memory = '256mb'
+  cpus = 1
+  memory_mb = 256
