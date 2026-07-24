@@ -1,0 +1,19 @@
+# Fly.io 배포 설정
+# 앱 이름(app)은 전세계에서 유일해야 합니다. flyctl launch 시 자동으로 바꿔줍니다.
+app = "study-time-bot"
+primary_region = "nrt"          # nrt = 도쿄 (한국에서 가장 가까움)
+
+[build]
+
+# 봇 기록(SQLite)을 저장할 영구 볼륨. 이름은 아래 가이드에서 만드는 볼륨과 같아야 함.
+[mounts]
+  source = "botdata"
+  destination = "/data"
+
+[env]
+  DATA_DIR = "/data"
+
+# 봇은 웹 서버가 아니므로 항상 켜져 있어야 합니다(자동 종료 금지).
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "256mb"
