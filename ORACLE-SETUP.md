@@ -74,7 +74,7 @@ cd ~
 git clone https://github.com/내아이디/worktime-bot.git
 cd worktime-bot
 ```
-(GitHub을 안 썼다면, 로컬에서 `scp -i 개인키 -r ~/서강대/worktime-bot ubuntu@서버IP:~/` 로 폴더를 통째로 올려도 됩니다.)
+(GitHub을 안 썼다면, 로컬에서 `scp -i 개인키 -r ~/worktime-bot ubuntu@서버IP:~/` 로 폴더를 통째로 올려도 됩니다.)
 
 ### (3) 파이썬 라이브러리 설치
 ```bash

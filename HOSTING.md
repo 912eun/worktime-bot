@@ -22,7 +22,8 @@
 두 방식 모두 코드를 GitHub에 올려두면 가장 편합니다.
 
 1. https://github.com 가입 → 로그인.
-2. 오른쪽 위 `+` → **New repository** → 이름(예: `study-time-bot`) 입력 → **Private** 선택 → **Create**.
+2. 오른쪽 위 `+` → **New repository** → 이름(예: `study-time-bot`) 입력 → **Create**.
+   - 토큰·DB를 올리지 않으므로 Public/Private 어느 쪽이든 괜찮습니다. 확신이 안 서면 Private으로 시작하세요.
 3. 이 폴더의 파일들(`bot.py`, `requirements.txt`, `Dockerfile`, `fly.toml`, `Procfile`, `.gitignore`, `README.md`)을 업로드.
    - 쉬운 방법: 새 저장소 화면의 **uploading an existing file** 링크 클릭 → 파일들을 드래그 → **Commit**.
    - ⚠️ **`.env` 파일과 `study_bot.db` 는 절대 올리지 마세요.** (`.gitignore` 가 막아주지만 수동 업로드 시 주의)
@@ -78,9 +79,15 @@ fly volumes create botdata --size 1 --region nrt
 ```
 (`botdata` 라는 이름은 `fly.toml` 의 `source = "botdata"` 와 같아야 합니다.)
 
-### 5. 봇 토큰을 비밀값으로 등록
+### 5. 봇 토큰·채널 ID를 비밀값으로 등록
 ```bash
-fly secrets set DISCORD_TOKEN=여기에_봇_토큰
+fly secrets set DISCORD_TOKEN=여기에_봇_토큰 REPORT_CHANNEL_ID=정산올릴_채널_ID
+```
+(`DATA_DIR=/data` 는 `fly.toml` 의 `[env]` 에 이미 들어 있어서 따로 안 넣어도 됩니다.)
+
+확인:
+```bash
+fly secrets list        # 값은 안 보이고 이름·수정시각만 보입니다
 ```
 
 ### 6. 배포
@@ -94,6 +101,28 @@ fly logs
 `로그인됨: ...` 이 보이면 성공. 디스코드에서 `!도움` 으로 확인하세요.
 
 이후 코드를 고치면 같은 폴더에서 `fly deploy` 만 다시 실행하면 됩니다.
+
+### 7. (선택) GitHub에 push하면 자동 배포되게 하기
+
+이 저장소에는 `.github/workflows/fly-deploy.yml` 이 들어 있어서, `FLY_API_TOKEN` 만 등록하면 `main` 브랜치에 push할 때마다 알아서 배포됩니다.
+
+```bash
+fly tokens create deploy      # 출력된 토큰 전체를 복사
+```
+
+GitHub 저장소 → **Settings → Secrets and variables → Actions → New repository secret**
+- Name: `FLY_API_TOKEN`
+- Secret: 방금 복사한 토큰
+
+이제 `git push` 만 하면 Actions 탭에서 배포가 도는 걸 볼 수 있습니다. (저장소가 Public이어도 Secret은 포크된 PR에 노출되지 않고, 이 워크플로는 `main` push에서만 실행됩니다.)
+
+### 상태 확인용 명령어
+```bash
+fly status               # 머신이 started 인지
+fly volumes list         # botdata 볼륨이 붙어 있는지
+fly secrets list         # DISCORD_TOKEN 이 등록돼 있는지
+fly logs                 # 실행 로그
+```
 
 ---
 

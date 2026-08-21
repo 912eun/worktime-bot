@@ -1,7 +1,12 @@
 .env
 *.db
 study_bot.db
+.venv/
+venv/
+env/
 __pycache__/
 *.pyc
 .git
+.github
+docs
 .DS_Store

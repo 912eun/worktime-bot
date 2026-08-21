@@ -2,6 +2,12 @@
 .env
 *.db
 study_bot.db
+
+# 가상환경
+.venv/
+venv/
+env/
+
 __pycache__/
 *.pyc
 .DS_Store
